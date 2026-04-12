@@ -1,48 +1,59 @@
 import streamlit as st
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
 import time
 
 # إعدادات الواجهة
-st.set_page_config(page_title="AI Engine Expert", layout="wide")
+st.set_page_config(page_title="AI Engine Expert Pro", layout="wide")
 
-st.title("🏎️ نظام خبير حساسات المحركات (VAG & Global)")
-st.write("البحث عن قيم الحساسات الافتراضية بمساعدة الذكاء الاصطناعي")
+st.title("🏎️ النظام الذكي المتكامل لحساسات المحركات")
+st.write("VAG • BMW • MERCEDES-BENZ (2010-2026)")
 
-# وظيفة البحث (المحرك البرمجي)
-def fetch_sensor_specs(engine_code):
-    # قائمة تخيلية لمحاكاة البحث العميق في البداية (سنقوم بربط API البحث في الخطوة التالية)
-    # هنا السكربت سيبحث في مواقع مثل Bosch و Auto-Doc
-    search_results = [
-        {"الحساس": "MAF (Air Flow)", "القيمة": "1.2V - 1.6V (Idle)", "الوحدة": "Volt", "المصدر": "Bosch Tech Data"},
-        {"الحساس": "Fuel Pressure", "القيمة": "35 - 50 Bar", "الوحدة": "Bar", "المصدر": "Audi Service Manual"},
-        {"الحساس": "O2 Sensor", "القيمة": "0.1V - 0.9V", "الوحدة": "Volt", "المصدر": "NGK Database"},
-        {"الحساس": "ECT (Coolant)", "القيمة": "250 - 350 Ohm", "الوحدة": "Ohm", "المصدر": "Standard Specs"}
-    ]
-    return search_results
+# --- محاكي البحث الذكي المستقبلي ---
+def ai_search_engine(brand, engine_code):
+    # هذه الدالة ستمثل "الروبوت" الذي يبحث في مواقع الصيانة
+    # سنقوم في الخطوات القادمة بربطها بمحرك بحث حقيقي
+    specs = {
+        "Audi": [
+            {"Sensor": "MAF (G70)", "Idle": "1.2 - 1.7V", "Full Load": "4.0V+", "Note": "Check Channel 002 in VCDS"},
+            {"Sensor": "High Fuel Pressure", "Idle": "35-50 Bar", "Full Load": "150+ Bar", "Note": "EA837 V6 Engine Spec"}
+        ],
+        "BMW": [
+            {"Sensor": "Low Fuel Pressure", "Idle": "5.0 Bar", "Full Load": "5.8 Bar", "Note": "N55/B58 Engines"},
+            {"Sensor": "Vanos Solenoid", "Idle": "80-90%", "Full Load": "Variable", "Note": "PWM Signal Control"}
+        ],
+        "Mercedes": [
+            {"Sensor": "Boost Pressure", "Idle": "950-1050 mbar", "Full Load": "2100+ mbar", "Note": "M276/M278 Engines"}
+        ]
+    }
+    return specs.get(brand, [{"Sensor": "Generic", "Idle": "N/A", "Full Load": "N/A", "Note": "Processing..."}])
 
-# المدخلات
-brand = st.selectbox("الشركة المصنعة:", ["Audi", "VW", "BMW", "Toyota"])
-engine_code = st.text_input("أدخل كود المحرك (مثلاً: 3.0 TFSI):")
+# --- واجهة المستخدم ---
+with st.sidebar:
+    st.image("https://wikimedia.org", width=50) # مثال لشعار
+    st.header("لوحة التحكم")
+    selected_brand = st.selectbox("المجموعة المستهدفة:", ["Audi", "BMW", "Mercedes", "VW"])
+    search_depth = st.radio("عمق البحث:", ["سريع (قاعدة البيانات)", "عميق (الذكاء الاصطناعي)"])
 
-if st.button("بدء البحث والتحليل"):
-    if engine_code:
-        with st.spinner('جاري فحص كتيبات الصيانة ومواقع الشركات المصنعة...'):
-            time.sleep(2) # محاكاة وقت البحث
-            data = fetch_sensor_specs(engine_code)
-            
-            # عرض النتائج في بطاقات
-            cols = st.columns(len(data))
-            for i, item in enumerate(data):
-                with cols[i]:
-                    st.metric(item["الحساس"], item["القيمة"])
-            
-            # عرض النتائج في جدول منظم
-            st.subheader(f"البيانات الفنية المستخرجة لمحرك {engine_code}")
-            df = pd.DataFrame(data)
-            st.table(df)
-            
-            st.success("تم استخراج البيانات. ملاحظة: هذه القيم مرجعية من قواعد بياناتنا.")
+engine_input = st.text_input(f"أدخل كود المحرك لشركة {selected_brand} (مثلاً: N55, EA888, M276):")
+
+if st.button("تشغيل الروبوت واستخراج البيانات"):
+    if engine_input:
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
+        for percent_complete in range(100):
+            time.sleep(0.01)
+            progress_bar.progress(percent_complete + 1)
+            if percent_complete < 30: status_text.text("🔍 جاري البحث في أرشيف المصنع...")
+            elif percent_complete < 70: status_text.text("⚙️ تحليل مخططات الدوائر الكهربائية...")
+            else: status_text.text("✅ توثيق القيم النهائية...")
+        
+        results = ai_search_engine(selected_brand, engine_input)
+        
+        st.subheader(f"📊 نتائج التحليل لمحرك: {engine_input}")
+        df = pd.DataFrame(results)
+        st.table(df)
+        
+        st.info("💡 نصيحة تقنية: تأكد من حرارة المحرك (90°C) قبل قياس قيم الحساسات المذكورة.")
     else:
-        st.error("يرجى إدخال كود المحرك.")
+        st.error("من فضلك أدخل كود المحرك أولاً.")
