@@ -1,7 +1,1 @@
-streamlit
-pandas
-openai
-requests
-beautifulsoup4
-sqlalchemy
-psycopg2-binary
+duckduckgo_search
