@@ -7,10 +7,16 @@ st.set_page_config(page_title="AI Engine Real-Time Search", layout="wide")
 
 # دالة البحث الحقيقي في الإنترنت (مجانية 100%)
 def real_time_search(query):
-    with DDGS() as ddgs:
-        # سنبحث عن قيم الحساسات في المواقع التقنية
-        results = ddgs.text(f"{query} engine sensor voltage resistance values specs", max_results=5)
-        return results
+    try:
+        with DDGS() as ddgs:
+            # إضافة sleep بسيط لتجنب الحظر من محركات البحث
+            time.sleep(1) 
+            results =
+            return results
+    except Exception as e:
+        st.error(f"حدث خطأ أثناء الاتصال بمحرك البحث: {e}")
+        return None
+
 
 st.title("🌐 محرك البحث التقني المباشر (VAG, BMW, MB)")
 st.write("هذا النظام يبحث الآن في الإنترنت " + "بشكل حي" + " لجلب بيانات المحركات")
