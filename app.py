@@ -1,45 +1,50 @@
+
 import streamlit as st
 from duckduckgo_search import DDGS
 
-st.set_page_config(page_title="Technical Sensor Expert", layout="wide")
+st.set_page_config(page_title="Sensor Technical Engine", layout="wide")
 
-st.title("🛠️ محلل قيم الحساسات (Technical Data Only)")
+st.title("🔬 مستخرج بيانات Bosch & Siemens المرجعية")
+st.write("البحث في كتالوجات الشركات المصنعة للحساسات وقواعد بيانات OEM")
 
-def professional_search(brand, code):
-    # استخدام كلمات مفتاحية هندسية واستهداف مواقع المحترفين فقط
-    tech_queries = [
-        f"site:ross-tech.com {code} sensor measuring blocks",
-        f"site:bimmerpost.com {code} sensor voltage resistance values",
-        f"site:mbworld.org {code} sensor specification data",
-        f"{brand} {code} 'nominal value' sensor voltage"
+def deep_tech_search(brand, code):
+    # استهداف شركات التصنيع والمواصفات الفنية الصارمة
+    queries = [
+        f"{brand} {code} sensor Bosch datasheet voltage",
+        f"{brand} {code} Siemens VDO sensor resistance values",
+        f"{brand} {code} MAF MAP sensor nominal values site:autocats.ws",
+        f"{brand} {code} engine technical data sheet PDF",
+        f"characteristic curve for {brand} {code} pressure sensor"
     ]
     
-    all_results = []
+    results_list = []
     try:
         with DDGS() as ddgs:
-            for q in tech_queries:
-                results = list(ddgs.text(q, max_results=2))
-                all_results.extend(results)
-        return all_results
+            for q in queries:
+                res = list(ddgs.text(q, max_results=2))
+                results_list.extend(res)
+        return results_list
     except:
         return []
 
 brand = st.sidebar.selectbox("الماركة", ["Audi", "BMW", "Mercedes", "VW"])
-code = st.text_input("أدخل كود المحرك (مثل: 3.0 TFSI أو N55):")
+engine = st.text_input("كود المحرك (مثل: EA837, N20, M271):")
 
-if st.button("استخراج القيم الفنية"):
-    if code:
-        with st.spinner("جاري تنقيب البيانات من منتديات المهندسين وكتيبات الصيانة..."):
-            res = professional_search(brand, code)
+if st.button("استخراج القيم المرجعية"):
+    if engine:
+        with st.spinner("جاري فحص فهارس Bosch و Siemens وقواعد البيانات الفنية..."):
+            tech_data = deep_tech_search(brand, engine)
             
-            if res:
-                st.success(f"تم العثور على {len(res)} مصادر تقنية متخصصة")
-                for item in res:
-                    # تصميم البطاقة لتبدو تقنية أكثر
+            if tech_data:
+                st.success(f"تم العثور على {len(tech_data)} وثيقة تقنية")
+                for data in tech_data:
                     with st.container():
-                        st.markdown(f"### 📄 {item['title']}")
-                        st.info(item['body'])
-                        st.caption(f"المصدر الفني: {item['href']}")
+                        st.markdown(f"#### 🛠️ {data['title']}")
+                        # تسليط الضوء على الأرقام داخل النص
+                        st.info(data['body'])
+                        st.caption(f"المصدر: {data['href']}")
                         st.divider()
             else:
-                st.warning("لم نجد بيانات دقيقة في المصادر المتخصصة. تأكد من كود المحرك.")
+                st.warning("لم نجد بيانات مباشرة. جرب إضافة 'MAF' أو 'O2' بجانب كود المحرك.")
+    else:
+        st.error("أدخل كود المحرك أولاً")
