@@ -1,37 +1,45 @@
 import streamlit as st
 from duckduckgo_search import DDGS
 
-st.set_page_config(page_title="Engine Expert", layout="wide")
+st.set_page_config(page_title="Technical Sensor Expert", layout="wide")
 
-st.title("🏎️ نظام خبير الحساسات")
+st.title("🛠️ محلل قيم الحساسات (Technical Data Only)")
 
-def start_search(q):
+def professional_search(brand, code):
+    # استخدام كلمات مفتاحية هندسية واستهداف مواقع المحترفين فقط
+    tech_queries = [
+        f"site:ross-tech.com {code} sensor measuring blocks",
+        f"site:bimmerpost.com {code} sensor voltage resistance values",
+        f"site:mbworld.org {code} sensor specification data",
+        f"{brand} {code} 'nominal value' sensor voltage"
+    ]
+    
+    all_results = []
     try:
-        # محاولة البحث بأكثر من طريقة
         with DDGS() as ddgs:
-            # زيادة عدد النتائج وتوسيع نطاق البحث
-            results = list(ddgs.text(f"{q} engine sensors technical specifications", max_results=5))
-            return results
-    except Exception as e:
-        # عرض الخطأ في حال وجوده للمساعدة في التشخيص
-        return [{"title": "خطأ تقني", "body": f"لم نتمكن من الاتصال بمحرك البحث: {str(e)}"}]
+            for q in tech_queries:
+                results = list(ddgs.text(q, max_results=2))
+                all_results.extend(results)
+        return all_results
+    except:
+        return []
 
 brand = st.sidebar.selectbox("الماركة", ["Audi", "BMW", "Mercedes", "VW"])
-code = st.text_input("أدخل كود المحرك (مثال: EA888):")
+code = st.text_input("أدخل كود المحرك (مثل: 3.0 TFSI أو N55):")
 
-if st.button("بدء البحث العميق"):
+if st.button("استخراج القيم الفنية"):
     if code:
-        with st.spinner("جاري استخراج البيانات من المصادر العالمية..."):
-            query = f"{brand} {code}"
-            res = start_search(query)
+        with st.spinner("جاري تنقيب البيانات من منتديات المهندسين وكتيبات الصيانة..."):
+            res = professional_search(brand, code)
             
             if res:
-                st.success(f"تم العثور على معلومات لمحرك {code}")
+                st.success(f"تم العثور على {len(res)} مصادر تقنية متخصصة")
                 for item in res:
-                    with st.expander(item.get('title', 'بدون عنوان')):
-                        st.write(item.get('body', 'لا يوجد تفاصيل'))
-                        st.caption(f"الرابط: {item.get('href', '#')}")
+                    # تصميم البطاقة لتبدو تقنية أكثر
+                    with st.container():
+                        st.markdown(f"### 📄 {item['title']}")
+                        st.info(item['body'])
+                        st.caption(f"المصدر الفني: {item['href']}")
+                        st.divider()
             else:
-                st.warning("لم يتم العثور على نتائج. حاول كتابة كود المحرك بشكل أبسط (مثلاً N55 بدلاً من BMW N55).")
-    else:
-        st.error("يرجى إدخال كود المحرك")
+                st.warning("لم نجد بيانات دقيقة في المصادر المتخصصة. تأكد من كود المحرك.")
